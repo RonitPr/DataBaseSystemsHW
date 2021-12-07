@@ -1,0 +1,4 @@
+-Listen and wait for HTTP requests.
+-Process the requests.
+-Send the response.
+-Stateless.

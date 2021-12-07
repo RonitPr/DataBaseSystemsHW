@@ -1,0 +1,3 @@
+-Send and recieve HTTP.
+-Read and parse HTML, JSON, XML.
+-Interact with the user.
