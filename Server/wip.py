@@ -4,6 +4,7 @@ import mysql.connector
 from environment import config, base_url
 import csv
 import urllib.request
+import json
 
 
 def create_table(cursor, table_name, col_dict):
@@ -16,7 +17,7 @@ def create_table(cursor, table_name, col_dict):
 
 
 # should we insert 1 at a time or collect many and send at once?
-def insert_tuple_CSV(connection, cursor, file_name, col_names):
+def insert_tuple_CSV(connection, cursor, file_name):
     with open(file_name, 'r', encoding='latin-1') as csv_file:
         r = csv.reader(csv_file)
         for row in r:
@@ -36,6 +37,8 @@ def get_answers_json(url, values_dict):
     data = urllib.parse.urlencode(values_dict)
     with urllib.request.urlopen(url+data) as response:
         res = response.read()
+        res = json.loads(res)
+
     print(res)
 
 
@@ -45,6 +48,6 @@ def get_answers_json(url, values_dict):
 create_table(
     0, "movies", {"tconst": "VARCHAR(255) PRIMARY KEY", "title": "VARCHAR(255)"})
 
-insert_tuple_CSV(0, 0, "imdb_data.csv")
+# insert_tuple_CSV(0, 0, "imdb_data.csv")
 
 get_answers_json(base_url(), {'i': 'tt3896198'})
