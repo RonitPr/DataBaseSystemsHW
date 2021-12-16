@@ -25,7 +25,7 @@ def create_database():
             'plot': 'TEXT NOTNULL',
             'box_office': 'INT NOT NULL',
             'imdb_rating': 'TINYINT(3) NOT NULL',
-            'PRIMERY KEY': '(movie_id)'
+            'PRIMARY KEY': '(movie_id)'
         })
 
         # add the fulltext reverse index later, after the db is stable.
