@@ -31,7 +31,7 @@ def create_database():
         # add the fulltext reverse index later, after the db is stable.
 
         create_table(cursor, 'genre', {
-            'genre_id': 'TINYINT(10)',
+            'genre_id': 'TINYINT(10) AUTO_INCREMENT',
             'name': 'CHAR(20) NOT NULL',
             'PRIMARY KEY': '(genre_id)'
         })
@@ -45,7 +45,7 @@ def create_database():
         })
 
         create_table(cursor, 'director', {
-            'director_id': 'SMALLINT',
+            'director_id': 'SMALLINT AUTO_INCREMENT',
             'name': 'VARCHAR(255) NOT NULL',
             'PRIMARY KEY': '(director_id)'
         })
@@ -59,7 +59,7 @@ def create_database():
         })
 
         create_table(cursor, 'actor', {
-            'actor_id': 'SMALLINT',
+            'actor_id': 'SMALLINT AUTO_INCREMENT',
             'name': 'VARCHAR(255) NOT NULL',
             'PRIMARY KEY': '(actor_id)'
         })
