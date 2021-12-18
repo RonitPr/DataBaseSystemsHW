@@ -78,7 +78,14 @@ def add_index():
     # after the DB is stable and we added the data, create the indexes.
     con = mysql.connector.connect(**config())
     with con:
-        return 0
+        cursor = con.cursor()
+        try:
+            cursor.execute(f'''
+            CREATE FULLTEXT INDEX idx ON movie(plot, title)
+            ''')
+        except:
+            print('Failed to create a fulltext index to movie table plot and title.')
+        # note -Index creation is automatically commited after execution.
 
 
 if __name__ == '__main__':
