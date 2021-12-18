@@ -24,7 +24,7 @@ def create_database():
             'runtime': 'TINYINT(3) NOT NULL',
             'plot': 'TEXT NOTNULL',
             'box_office': 'INT NOT NULL',
-            'imdb_rating': 'TINYINT(3) NOT NULL',
+            'imdb_rating': 'DECIMAL(4,2) NOT NULL',
             'PRIMARY KEY': '(movie_id)'
         })
 
