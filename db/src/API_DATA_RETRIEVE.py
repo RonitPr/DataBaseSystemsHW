@@ -52,37 +52,46 @@ def insert_movie(data):
     director_list = create_list_of(data, 'Director')
     actor_list = create_list_of(data, 'Actors')
 
-    # set up the queries for inserting the data.
+    # set up the queries for inserting the data to the tables without foreigh keys.
     insert_movie_query = f'''INSERT INTO movie (movie_id, title, year, rated, runtime, plot, box_office, imdb_rating) 
-        VALUES ({data['imdbID']},{data['Title']},{data['Year']},{data['Rated']},{runtime},{data['Plot']},{data['BoxOffice']},{data['imdbRating']});
+        VALUES ('{data['imdbID']}','{data['Title']}','{data['Year']}','{data['Rated']}','{runtime}','{data['Plot']}','{data['BoxOffice']}','{data['imdbRating']}');
         '''
     insert_genre_queries = []
     for genre in genre_list:
         insert_genre_queries.append(f'''INSERT IGNORE INTO genre (name)
-            VALUES ({genre});
-            ''')
-    insert_moviegenre_queries = []
-    for genre in genre_list:
-        insert_moviegenre_queries.append(f'''INSERT INTO movie_genre (movie_id, genre_id)
-            VALUES ({data['imdbID']},{1});
+            VALUES ('{genre}');
             ''')
 
     insert_director_queries = []
     for director in director_list:
         insert_director_queries.append(f'''INSERT IGNORE INTO director (name)
-            VALUES ({director});
-            ''')
-        insert_director_queries.append(f'''INSERT INTO movie_director (movie_id, director_id)
-            VALUES ({data['imdbID']},{1});
+            VALUES ('{director}');
             ''')
 
     insert_actor_queries = []
     for actor in actor_list:
         insert_actor_queries.append(
-            f'''INSERT IGNORE INTO actor (name) VALUES ({actor});
+            f'''INSERT IGNORE INTO actor (name) VALUES ('{actor}');
             ''')
-        insert_actor_queries.append(
-            f'''INSERT INTO movie_actor (movie_id, actor_id) VALUES ({data['imdbID']},{1});
+    # TODO - execute and commit.
+
+    # set up the queries for inserting the data to the tables with foreigh keys.
+    insert_moviegenre_queries = []
+    for genre in genre_list:
+        insert_moviegenre_queries.append(f'''INSERT INTO movie_genre (movie_id, genre_id)
+            VALUES ('{data['imdbID']}','{1}');
+            ''')
+
+    insert_moviedirector_queries = []
+    for director in director_list:
+        insert_moviedirector_queries.append(f'''INSERT INTO movie_director (movie_id, director_id)
+            VALUES ('{data['imdbID']}','{1}');
+            ''')
+
+    insert_movieactor_queries = []
+    for actor in actor_list:
+        insert_movieactor_queries.append(
+            f'''INSERT INTO movie_actor (movie_id, actor_id) VALUES ('{data['imdbID']}','{1}');
             ''')
 
     # connect to db and execute the queries.
