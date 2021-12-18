@@ -9,6 +9,7 @@ def create_table(cursor, tableName, optionDict):
         columns += f"{key} {optionDict[key]}, "
     columns = columns[:len(columns) - 2]
     cursor.execute(f"CREATE TABLE {tableName} ({columns}) ENGINE=InnoDB")
+    # note - CREATE statements are automatically commited after execution.
 
 
 def create_database():
@@ -22,7 +23,7 @@ def create_database():
             'year': 'YEAR(4) NOT NULL',
             'rated': 'CHAR(5) NOT NULL',
             'runtime': 'TINYINT NOT NULL',
-            'plot': 'TEXT NOTNULL',
+            'plot': 'TEXT NOT NULL',
             'box_office': 'INT NOT NULL',
             'imdb_rating': 'DECIMAL(4,2) NOT NULL',
             'PRIMARY KEY': '(movie_id)'
@@ -53,7 +54,7 @@ def create_database():
         create_table(cursor, 'movie_director', {
             'movie_id': 'CHAR(10)',
             'director_id': 'SMALLINT',
-            'PRIMARY KEY': '(imdb_id,director_id)',
+            'PRIMARY KEY': '(movie_id,director_id)',
             'FOREIGN KEY (director_id)': 'REFERENCES director(director_id)',
             'FOREIGN KEY (movie_id)': 'REFERENCES movie(movie_id)'
         })
@@ -67,7 +68,7 @@ def create_database():
         create_table(cursor, 'movie_actor', {
             'movie_id': 'CHAR(10)',
             'actor_id': 'SMALLINT',
-            'PRIMARY KEY': '(imdb_id,actor_id)',
+            'PRIMARY KEY': '(movie_id,actor_id)',
             'FOREIGN KEY (actor_id)': 'REFERENCES actor(actor_id)',
             'FOREIGN KEY (movie_id)': 'REFERENCES movie(movie_id)'
         })
