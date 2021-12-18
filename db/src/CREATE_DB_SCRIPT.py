@@ -18,10 +18,10 @@ def create_database():
         cursor = con.cursor()
         create_table(cursor, 'movie', {
             'movie_id': 'CHAR(10)',
-            'title': 'VARCHAR(255) NOT NULL',
+            'title': 'VARCHAR(100) NOT NULL',
             'year': 'YEAR(4) NOT NULL',
             'rated': 'CHAR(5) NOT NULL',
-            'runtime': 'TINYINT(3) NOT NULL',
+            'runtime': 'TINYINT NOT NULL',
             'plot': 'TEXT NOTNULL',
             'box_office': 'INT NOT NULL',
             'imdb_rating': 'DECIMAL(4,2) NOT NULL',
@@ -31,14 +31,14 @@ def create_database():
         # add the fulltext reverse index later, after the db is stable.
 
         create_table(cursor, 'genre', {
-            'genre_id': 'TINYINT(10) AUTO_INCREMENT',
+            'genre_id': 'TINYINT AUTO_INCREMENT',
             'name': 'CHAR(20) NOT NULL',
             'PRIMARY KEY': '(genre_id)'
         })
 
         create_table(cursor, 'movie_genre', {
             'movie_id': 'CHAR(10)',
-            'genre_id': 'TINYINT(10)',
+            'genre_id': 'TINYINT',
             'PRIMARY KEY': '(movie_id,genre_id)',
             'FOREIGN KEY (genre_id)': 'REFERENCES genre(genre_id)',
             'FOREIGN KEY (movie_id)': 'REFERENCES movie(movie_id)'
@@ -46,7 +46,7 @@ def create_database():
 
         create_table(cursor, 'director', {
             'director_id': 'SMALLINT AUTO_INCREMENT',
-            'name': 'VARCHAR(255) NOT NULL',
+            'name': 'VARCHAR(100) NOT NULL',
             'PRIMARY KEY': '(director_id)'
         })
 
@@ -60,7 +60,7 @@ def create_database():
 
         create_table(cursor, 'actor', {
             'actor_id': 'SMALLINT AUTO_INCREMENT',
-            'name': 'VARCHAR(255) NOT NULL',
+            'name': 'VARCHAR(100) NOT NULL',
             'PRIMARY KEY': '(actor_id)'
         })
 
