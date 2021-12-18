@@ -23,7 +23,7 @@ def get_csv_data(filename):
                         if count > 10000:
                             break
                         if row[1] == 'movie' and row[5].isdecimal() and int(row[5]) > 1990:
-                            if count % 1 == 0 and count != 0:  # TODO - change back to 1000
+                            if count % 1000 == 0 and count != 0:
                                 output.write(f'{row[0]}\n')
                             elif count == 10000:
                                 output.write(f'{row[0]}')
@@ -42,6 +42,7 @@ def create_list_of(data, data_key):
 
 
 def insert_movie(data):
+    con = mysql.connector.connect(**config())
     # set up values to go into the inserts.
     runtime = data['Runtime']
     for word in runtime.split():
@@ -73,7 +74,16 @@ def insert_movie(data):
         insert_actor_queries.append(
             f'''INSERT IGNORE INTO actor (name) VALUES ('{actor}');
             ''')
-    # TODO - execute and commit.
+    queries = " ".join([insert_movie_query, *insert_genre_queries,
+                        *insert_director_queries, *insert_actor_queries])
+    with con:
+        cursor = con.cursor()
+        try:
+            for query in queries:
+                cursor.execute(query)
+            con.commit()
+        except:
+            con.rollback()
 
     # set up the queries for inserting the data to the tables with foreigh keys.
     insert_moviegenre_queries = []
@@ -94,18 +104,16 @@ def insert_movie(data):
             f'''INSERT INTO movie_actor (movie_id, actor_id) VALUES ('{data['imdbID']}','{1}');
             ''')
 
-    # connect to db and execute the queries.
-    print(" ".join(insert_actor_queries))
-    # con = mysql.connector.connect(**config())
-    # with con:
-    #     cursor = con.cursor()
-    #     try:
-    #         cursor.execute(insert_movie_query)
-    #         # more here
-    #         con.commit()
-    #     except:
-    #         print("Failed executing the insertion queries.")
-    #         con.rollback()
+    queries = " ".join([*insert_moviegenre_queries,
+                        *insert_moviedirector_queries, *insert_movieactor_queries])
+    with con:
+        cursor = con.cursor()
+        try:
+            for query in queries:
+                cursor.execute(query)
+            con.commit()
+        except:
+            con.rollback()
 
 
 def insert_movies_batch(line):
@@ -136,4 +144,4 @@ if __name__ == '__main__':
                     insert_movies_batch(stripped_line)
 
     except:
-        print('failed to open the csv_movie_ids.txt file.')
+        print('failed to open the csv_movie_ids.txt file and insert the data.')
