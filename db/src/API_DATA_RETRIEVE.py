@@ -1,7 +1,6 @@
 # The code which inserts data to our DB.
 
 import csv
-from random import expovariate
 import mysql.connector
 from environment import config, base_url
 import urllib.request
@@ -41,8 +40,8 @@ def create_list_of(data, data_key):
     return l
 
 
-def insert_movie(data):
-    con = mysql.connector.connect(**config())
+def get_main_queries(data):
+    # get the queries that insert data to the main tables, and the relevant lists that were inserted.
     # set up values to go into the inserts.
     runtime = data['Runtime']
     for word in runtime.split():
@@ -53,8 +52,7 @@ def insert_movie(data):
     director_list = create_list_of(data, 'Director')
     actor_list = create_list_of(data, 'Actors')
 
-    # set up the queries for inserting the data to the tables without foreigh keys.
-    insert_movie_query = f'''INSERT INTO movie (movie_id, title, year, rated, runtime, plot, box_office, imdb_rating) 
+    insert_movie_query = f'''INSERT INTO movie (movie_id, title, year, rated, runtime, plot, box_office, imdb_rating)
         VALUES ('{data['imdbID']}','{data['Title']}','{data['Year']}','{data['Rated']}','{runtime}','{data['Plot']}','{data['BoxOffice']}','{data['imdbRating']}');
         '''
     insert_genre_queries = []
@@ -74,45 +72,61 @@ def insert_movie(data):
         insert_actor_queries.append(
             f'''INSERT IGNORE INTO actor (name) VALUES ('{actor}');
             ''')
-    queries = " ".join([insert_movie_query, *insert_genre_queries,
-                        *insert_director_queries, *insert_actor_queries])
-    with con:
-        cursor = con.cursor()
-        try:
-            for query in queries:
-                cursor.execute(query)
-            con.commit()
-        except:
-            con.rollback()
 
-    # set up the queries for inserting the data to the tables with foreigh keys.
+    return (" ".join([insert_movie_query, *insert_genre_queries,
+                      *insert_director_queries, *insert_actor_queries]), genre_list, director_list, actor_list)
+
+
+def get_secondary_queries(con, data, genre_list, director_list, actor_list):
+    cursor2 = con.cursor()
     insert_moviegenre_queries = []
     for genre in genre_list:
+        cursor2.execute(
+            f'''SELECT genre_id FROM genre where name = '{genre}' ''')
+        genre_id = cursor2.fetchone()[0]
         insert_moviegenre_queries.append(f'''INSERT INTO movie_genre (movie_id, genre_id)
-            VALUES ('{data['imdbID']}','{1}');
+            VALUES ('{data['imdbID']}','{genre_id}');
             ''')
 
     insert_moviedirector_queries = []
     for director in director_list:
+        cursor2.execute(
+            f'''SELECT director_id FROM director where name = '{director}' ''')
+        director_id = cursor2.fetchone()[0]
         insert_moviedirector_queries.append(f'''INSERT INTO movie_director (movie_id, director_id)
-            VALUES ('{data['imdbID']}','{1}');
+            VALUES ('{data['imdbID']}','{director_id}');
             ''')
 
     insert_movieactor_queries = []
     for actor in actor_list:
+        cursor2.execute(
+            f'''SELECT actor_id FROM genre where name = '{actor}' ''')
+        actor_id = cursor2.fetchone()[0]
         insert_movieactor_queries.append(
-            f'''INSERT INTO movie_actor (movie_id, actor_id) VALUES ('{data['imdbID']}','{1}');
+            f'''INSERT INTO movie_actor (movie_id, actor_id) VALUES ('{data['imdbID']}','{actor_id}');
             ''')
 
-    queries = " ".join([*insert_moviegenre_queries,
-                        *insert_moviedirector_queries, *insert_movieactor_queries])
+    return " ".join([*insert_moviegenre_queries,
+                     *insert_moviedirector_queries, *insert_movieactor_queries])
+
+
+def insert_movie_data(data):
+    con = mysql.connector.connect(**config())
+    queries_main, genres, directors, actors = get_main_queries(data)
     with con:
-        cursor = con.cursor()
         try:
-            for query in queries:
+            queries_secondary = get_secondary_queries(
+                con, data, genres, directors, actors)
+            cursor = con.cursor()
+
+            for query in queries_main:
+                cursor.execute(query)
+            con.commit()
+            for query in queries_secondary:
                 cursor.execute(query)
             con.commit()
         except:
+            print("Inserting movie process failed.")
             con.rollback()
 
 
@@ -124,7 +138,7 @@ def insert_movies_batch(line):
         with urllib.request.urlopen(base_url() + params) as response:
             res = response.read()
             res = json.loads(res)
-        insert_movie(res)
+        insert_movie_data(res)
 
 
 if __name__ == '__main__':
