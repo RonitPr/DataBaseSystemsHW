@@ -21,7 +21,7 @@ def get_csv_data(filename):
                     for row in r:
                         if count > 10000:
                             break
-                        if row[1] == 'movie' and row[5].isdecimal() and int(row[5]) > 1990:
+                        if row[1] == 'movie' and row[5].isdecimal() and int(row[5]) > 2005:
                             if count % 1000 == 0 and count != 0:
                                 output.write(f'{row[0]}\n')
                             elif count == 10000:
@@ -148,14 +148,14 @@ if __name__ == '__main__':
     line_index = int(sys.argv[1])
 
     get_csv_data("imdb_data.csv")
-    try:
-        with open('csv_movie_ids.txt', 'r') as in_file:
-            count = 0
-            for line in in_file:
-                count += 1
-                if count == line_index:
-                    stripped_line = line.strip()
-                    insert_movies_batch(stripped_line)
+    # try:
+    #     with open('csv_movie_ids.txt', 'r') as in_file:
+    #         count = 0
+    #         for line in in_file:
+    #             count += 1
+    #             if count == line_index:
+    #                 stripped_line = line.strip()
+    #                 insert_movies_batch(stripped_line)
 
-    except:
-        print('failed to open the csv_movie_ids.txt file and insert the data.')
+    # except:
+    #     print('failed to open the csv_movie_ids.txt file and insert the data.')
