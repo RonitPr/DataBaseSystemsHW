@@ -87,7 +87,7 @@ def get_secondary_tables_insert_queries(con, data, actor_list, director_list, ge
     # return insert queries for movie_actor, movie_director, movie_genre in format:
     # [('query with %s',(values))]
     q = []
-    cursor2 = con.cursor(prepared=True, buffered=True)
+    cursor2 = con.cursor(buffered=True)
     for genre in genre_list:
         cursor2.execute(
             f'''SELECT genre_id from genre where name = '{genre}';''')
@@ -114,7 +114,7 @@ def insert_single_movie(con, data):
     al = get_list_of(data, 'Actors')
     dl = get_list_of(data, 'Director')
     gl = get_list_of(data, 'Genre')
-    cursor = con.cursor(prepared=True, buffered=True)
+    cursor = con.cursor(prepared=True)
     q = get_main_tables_insert_queries(data, al, dl, gl)
     for query, values in q:
         try:
