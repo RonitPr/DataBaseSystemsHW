@@ -21,7 +21,7 @@ def create_database():
             'movie_id': 'CHAR(10)',
             'title': 'VARCHAR(100) NOT NULL',
             'year': 'YEAR(4) NOT NULL',
-            'rated': 'CHAR(5) NOT NULL',
+            'rated': 'CHAR(10) NOT NULL',
             'runtime': 'TINYINT NOT NULL',
             'plot': 'TEXT NOT NULL',
             'box_office': 'INT NOT NULL',
