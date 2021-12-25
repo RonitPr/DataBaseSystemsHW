@@ -171,7 +171,7 @@ def clear_all_tables():
     con.commit()
 
 
-def alterLMAO():
+def alterLMAO():  # todo - delete this function
     con = mysql.connector.connect(**config())
     cursor = con.cursor()
     cursor.execute(
@@ -185,7 +185,6 @@ if __name__ == '__main__':
     line_index = int(sys.argv[1])
     get_csv_data("imdb_data.csv")
     if line_index == 404:
-        alterLMAO()
         clear_all_tables()
     try:
         with open('csv_movie_ids.txt', 'r') as in_file:
