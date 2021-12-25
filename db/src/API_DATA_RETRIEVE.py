@@ -174,7 +174,8 @@ def clear_all_tables():
 def alterLMAO():
     con = mysql.connector.connect(**config())
     cursor = con.cursor()
-    cursor.execute('''ALTER TABLE movie MODIFY rated CHAR( 10 ) NOT NULL''')
+    cursor.execute(
+        '''ALTER TABLE movie MODIFY runtime TINYINT UNSIGNED NOT NULL''')
 
 
 if __name__ == '__main__':
@@ -184,6 +185,7 @@ if __name__ == '__main__':
     line_index = int(sys.argv[1])
     get_csv_data("imdb_data.csv")
     if line_index == 404:
+        alterLMAO()
         clear_all_tables()
     try:
         with open('csv_movie_ids.txt', 'r') as in_file:

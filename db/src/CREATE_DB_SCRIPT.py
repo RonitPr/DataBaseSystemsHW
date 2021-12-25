@@ -22,7 +22,7 @@ def create_database():
             'title': 'VARCHAR(100) NOT NULL',
             'year': 'YEAR(4) NOT NULL',
             'rated': 'CHAR(10) NOT NULL',
-            'runtime': 'TINYINT NOT NULL',
+            'runtime': 'TINYINT UNSIGNED NOT NULL',
             'plot': 'TEXT NOT NULL',
             'box_office': 'INT NOT NULL',
             'imdb_rating': 'DECIMAL(4,2) NOT NULL',
