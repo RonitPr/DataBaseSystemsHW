@@ -74,12 +74,12 @@ def get_main_tables_insert_queries(data, actor_list, director_list, genre_list):
                get_int_boxoffice(data['BoxOffice']),
                data['imdbRating'])))
     for genre in genre_list:
-        q.append(('INSERT INTO genre (name) VALUES (%s);', [genre]))
+        q.append(('INSERT IGNORE INTO genre (name) VALUES (%s);', [genre]))
     for director in director_list:
         q.append(
-            ('INSERT INTO director (name) VALUES (%s);', [director]))
+            ('INSERT IGNORE INTO director (name) VALUES (%s);', [director]))
     for actor in actor_list:
-        q.append(('INSERT INTO actor (name) VALUES (%s);', [actor]))
+        q.append(('INSERT IGNORE INTO actor (name) VALUES (%s);', [actor]))
     return q
 
 
@@ -90,22 +90,28 @@ def get_secondary_tables_insert_queries(con, data, actor_list, director_list, ge
     cursor2 = con.cursor(buffered=True)
     for genre in genre_list:
         cursor2.execute(
-            f'''SELECT genre_id from genre where name = '{genre}';''')
-        id = cursor2.fetchone()[0]
+            "SELECT genre_id from genre where name = %s;", [genre])
+        id = cursor2.fetchone()
+        if id is None:
+            break
         q.append(('INSERT INTO movie_genre (movie_id, genre_id) VALUES (%s,%s)',
-                  (data['imdbID'], id)))
+                  (data['imdbID'], id[0])))
     for director in director_list:
         cursor2.execute(
-            f'''SELECT director_id from director where name = '{director}';''')
-        id = cursor2.fetchone()[0]
+            "SELECT director_id from director where name = %s;", [director])
+        id = cursor2.fetchone()
+        if id is None:
+            break
         q.append(('INSERT INTO movie_director (movie_id, director_id) VALUES (%s,%s)',
-                  (data['imdbID'], id)))
+                  (data['imdbID'], id[0])))
     for actor in actor_list:
         cursor2.execute(
-            f'''SELECT actor_id from actor where name = '{actor}';''')
-        id = cursor2.fetchone()[0]
+            "SELECT actor_id from actor where name = %s;", [actor])
+        id = cursor2.fetchone()
+        if id is None:
+            break
         q.append(('INSERT INTO movie_actor (movie_id, actor_id) VALUES (%s,%s)',
-                  (data['imdbID'], id)))
+                  (data['imdbID'], id[0])))
     return q
 
 
@@ -142,6 +148,8 @@ def insert_movies_batch(line):
     count_insertions = 0
     ids_list = line.split(" ")
     for id in ids_list:
+        if count_insertions % 10 == 0:
+            print(f"Inserted {count_insertions} movies. Continuing...")
         params = urllib.parse.urlencode({'i': id})
         with urllib.request.urlopen(base_url() + params) as response:
             res = response.read()
