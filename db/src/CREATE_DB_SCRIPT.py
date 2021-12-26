@@ -34,7 +34,8 @@ def create_database():
         create_table(cursor, 'genre', {
             'genre_id': 'TINYINT AUTO_INCREMENT',
             'name': 'CHAR(20) NOT NULL',
-            'PRIMARY KEY': '(genre_id)'
+            'PRIMARY KEY': '(genre_id)',
+            'CONSTRAINT': 'genre_unique UNIQUE (name)'
         })
 
         create_table(cursor, 'movie_genre', {
@@ -48,7 +49,8 @@ def create_database():
         create_table(cursor, 'director', {
             'director_id': 'SMALLINT AUTO_INCREMENT',
             'name': 'VARCHAR(100) NOT NULL',
-            'PRIMARY KEY': '(director_id)'
+            'PRIMARY KEY': '(director_id)',
+            'CONSTRAINT': 'director_unique UNIQUE (name)'
         })
 
         create_table(cursor, 'movie_director', {
@@ -62,7 +64,8 @@ def create_database():
         create_table(cursor, 'actor', {
             'actor_id': 'SMALLINT AUTO_INCREMENT',
             'name': 'VARCHAR(100) NOT NULL',
-            'PRIMARY KEY': '(actor_id)'
+            'PRIMARY KEY': '(actor_id)',
+            'CONSTRAINT': 'actor_unique UNIQUE (name)'
         })
 
         create_table(cursor, 'movie_actor', {

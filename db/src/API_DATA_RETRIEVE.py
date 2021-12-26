@@ -74,12 +74,12 @@ def get_main_tables_insert_queries(data, actor_list, director_list, genre_list):
                get_int_boxoffice(data['BoxOffice']),
                data['imdbRating'])))
     for genre in genre_list:
-        q.append(('INSERT IGNORE INTO genre (name) VALUES (%s);', [genre]))
+        q.append(('INSERT INTO genre (name) VALUES (%s);', [genre]))
     for director in director_list:
         q.append(
-            ('INSERT IGNORE INTO director (name) VALUES (%s);', [director]))
+            ('INSERT INTO director (name) VALUES (%s);', [director]))
     for actor in actor_list:
-        q.append(('INSERT IGNORE INTO actor (name) VALUES (%s);', [actor]))
+        q.append(('INSERT INTO actor (name) VALUES (%s);', [actor]))
     return q
 
 
@@ -174,8 +174,12 @@ def clear_all_tables():
 def alterLMAO():  # todo - delete this function
     con = mysql.connector.connect(**config())
     cursor = con.cursor()
-    cursor.execute(
-        '''ALTER TABLE movie MODIFY runtime TINYINT UNSIGNED NOT NULL''')
+    sql1 = '''ALTER TABLE actor ADD CONSTRAINT actor_unique UNIQUE (name)'''
+    sql2 = '''ALTER TABLE director ADD CONSTRAINT director_unique UNIQUE (name)'''
+    sql3 = '''ALTER TABLE genre ADD CONSTRAINT genre_unique UNIQUE (name)'''
+    cursor.execute(sql1)
+    cursor.execute(sql2)
+    cursor.execute(sql3)
 
 
 if __name__ == '__main__':
