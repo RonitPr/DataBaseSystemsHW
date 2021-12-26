@@ -48,12 +48,12 @@ def get_csv_data(filename):
             except:
                 with open('csv_movie_ids.txt', 'w') as output:
                     for row in r:
-                        if count > 30000:
+                        if count > 50000:
                             break
-                        if row[1] == 'movie' and row[5].isdecimal() and int(row[5]) > 2000:
+                        if row[1] == 'movie' and row[5].isdecimal() and int(row[5]) > 1990 and row[7] != "\\N":
                             if count % 1000 == 0 and count != 0:
                                 output.write(f'{row[0]}\n')
-                            elif count == 30000:
+                            elif count == 50000:
                                 output.write(f'{row[0]}')
                             else:
                                 output.write(f'{row[0]} ')
