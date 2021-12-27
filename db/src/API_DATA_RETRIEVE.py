@@ -38,26 +38,24 @@ def get_runtime(str):
 
 
 def get_csv_data(filename):
-    # into a new file, write 10 lines of 1000 movie ids, seperated by spaces.
+    # into a new file, write 10 lines of 1000 movie ids, separated by spaces.
     count = 1
     try:
         with open(filename, 'r', encoding='latin-1') as csvFile:
             r = csv.reader(csvFile)
-            try:
-                open('csv_movie_ids.txt')
-            except:
-                with open('csv_movie_ids.txt', 'w') as output:
-                    for row in r:
-                        if count > 70000:
-                            break
-                        if row[1] == 'movie' and row[5].isdecimal() and int(row[5]) > 1900 and row[7] != "\\N":
-                            if count % 1000 == 0 and count != 0:
-                                output.write(f'{row[0]}\n')
-                            elif count == 70000:
-                                output.write(f'{row[0]}')
-                            else:
-                                output.write(f'{row[0]} ')
-                            count += 1
+            # try:
+            #     open('csv_movie_ids.txt')
+            # except:
+            with open('csv_movie_ids.txt', 'w') as output:
+                for row in r:
+                    if count > 100000:
+                        break
+                    if row[1] == 'movie' and row[5].isdecimal() and int(row[5]) >= 1990 and row[7] != "\\N":
+                        if count == 100000:
+                            output.write(f'{row[0]}')
+                        else:
+                            output.write(f'{row[0]} ')
+                        count += 1
     except:
         return "failed to get CSV data"
 
@@ -160,7 +158,7 @@ def insert_movies_batch(line):
                 count_insertions += 1
             except Exception as e:
                 print(
-                    f'Failed inserting movie {id} with exception: {e}. Skipping..')
+                    f'Failed inserting movie {id} with exception: {e}. Skipping...')
     print('**********')
     print(f'Successfuly inserted {count_insertions} movies into DB.')
     print('**********')
@@ -191,21 +189,14 @@ def alterLMAO():  # todo - delete this function
 
 
 if __name__ == '__main__':
-    if len(sys.argv) == 1:
-        print("Please provide the line number you want to insert to the db.")
-        sys.exit(1)
-    line_index = int(sys.argv[1])
     get_csv_data("imdb_data.csv")
-    if line_index == 404:
-        clear_all_tables()
+    # if line_index == 404:
+    #     clear_all_tables()
     try:
         with open('csv_movie_ids.txt', 'r') as in_file:
-            count = 0
             for line in in_file:
-                count += 1
-                if count == line_index:
-                    stripped_line = line.strip()
-                    insert_movies_batch(stripped_line)
+                stripped_line = line.strip()
+                insert_movies_batch(stripped_line)
     except Exception as e:
         print(
             f'Failed to open the csv_movie_ids.txt file and insert the data: {e}')
