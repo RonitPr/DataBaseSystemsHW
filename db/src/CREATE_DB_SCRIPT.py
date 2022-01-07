@@ -1,14 +1,18 @@
 import mysql.connector
 from environment import config
+import sys
 
 
 def create_table(cursor, tableName, optionDict):
-    # execute on cursor the creation of a table with tableName with the columns described in colDict
+    # execute on cursor the creation of a table with tableName with the columns described in optionDict
     columns = ""
     for key in optionDict.keys():
         columns += f"{key} {optionDict[key]}, "
     columns = columns[:len(columns) - 2]
-    cursor.execute(f"CREATE TABLE {tableName} ({columns}) ENGINE=InnoDB")
+    try:
+        cursor.execute(f"CREATE TABLE {tableName} ({columns}) ENGINE=InnoDB")
+    except Exception as e:
+        print(f'Failed Creating {tableName} table in DB with error: {e}.')
     # note - CREATE statements are automatically commited after execution.
 
 
@@ -24,12 +28,9 @@ def create_database():
             'rated': 'CHAR(10) NOT NULL',
             'runtime': 'TINYINT UNSIGNED NOT NULL',
             'plot': 'TEXT NOT NULL',
-            'box_office': 'INT NOT NULL',
             'imdb_rating': 'DECIMAL(4,2) NOT NULL',
             'PRIMARY KEY': '(movie_id)'
         })
-
-        # add the fulltext reverse index later, after the db is stable.
 
         create_table(cursor, 'genre', {
             'genre_id': 'TINYINT AUTO_INCREMENT',
@@ -92,4 +93,11 @@ def add_index():
 
 
 if __name__ == '__main__':
-    create_database()
+    if len(sys.argv) != 2:
+        print("Run with 0 to create DB. Run with 1 to create Indexes for the DB.")
+        sys.exit(1)
+    option = int(sys.argv[1])
+    if option == 0:
+        create_database()
+    if option == 1:
+        add_index()
