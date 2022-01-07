@@ -3,7 +3,6 @@ import mysql.connector
 from environment import config, base_url
 import urllib.request
 import json
-import sys
 
 # utility functions
 
@@ -22,13 +21,6 @@ def check_nulls(values):
     return False
 
 
-def get_int_boxoffice(str):
-    s = ""
-    for word in str[1:].split(","):
-        s += word
-    return int(s)
-
-
 def get_runtime(str):
     for word in str.split():
         if word.isdigit():
@@ -38,23 +30,17 @@ def get_runtime(str):
 
 
 def get_csv_data(filename):
-    # into a new file, write 10 lines of 1000 movie ids, separated by spaces.
+    # Write 100,000 movie imdb ids in a txt file from a given csv.
     count = 1
     try:
         with open(filename, 'r', encoding='latin-1') as csvFile:
             r = csv.reader(csvFile)
-            # try:
-            #     open('csv_movie_ids.txt')
-            # except:
             with open('csv_movie_ids.txt', 'w') as output:
                 for row in r:
                     if count > 100000:
                         break
                     if row[1] == 'movie' and row[5].isdecimal() and int(row[5]) >= 1990 and row[7] != "\\N":
-                        if count == 100000:
-                            output.write(f'{row[0]}')
-                        else:
-                            output.write(f'{row[0]} ')
+                        output.write(f'{row[0]} ')
                         count += 1
     except:
         return "failed to get CSV data"
@@ -64,12 +50,11 @@ def get_main_tables_insert_queries(data, actor_list, director_list, genre_list):
     # return insert queries for movie, actor, director, genre in format:
     # [('query with %s',(values))]
     q = []
-    q.append(('INSERT INTO movie (movie_id, title, year, rated, runtime, plot, box_office, imdb_rating) VALUES(%s,%s,%s,%s,%s,%s,%s,%s);',
+    q.append(('INSERT INTO movie (movie_id, title, year, rated, runtime, plot, imdb_rating) VALUES(%s,%s,%s,%s,%s,%s,%s);',
               (data['imdbID'], data['Title'],
                data['Year'], data['Rated'],
                get_runtime(data['Runtime']),
                data['Plot'],
-               get_int_boxoffice(data['BoxOffice']),
                data['imdbRating'])))
     for genre in genre_list:
         q.append(('INSERT IGNORE INTO genre (name) VALUES (%s);', [genre]))
@@ -152,7 +137,7 @@ def insert_movies_batch(line):
         with urllib.request.urlopen(base_url() + params) as response:
             res = response.read()
             res = json.loads(res)
-        if not check_nulls([res['Year'], res['Runtime'], res['BoxOffice'], res['imdbRating']]):
+        if not check_nulls([res['Year'], res['Runtime'], res['imdbRating']]):
             try:
                 insert_single_movie(con, res)
                 count_insertions += 1
@@ -164,34 +149,8 @@ def insert_movies_batch(line):
     print('**********')
 
 
-def clear_all_tables():
-    con = mysql.connector.connect(**config())
-    cursor = con.cursor(prepared=True)
-    clear_q = ['DELETE FROM movie_actor;', 'DELETE FROM movie_director;', 'DELETE FROM movie_genre;',
-               'DELETE FROM movie;', 'DELETE FROM actor;', 'DELETE FROM director;', 'DELETE FROM genre;']
-    reset_ids_q = ['ALTER TABLE actor AUTO_INCREMENT = 1;',
-                   'ALTER TABLE director AUTO_INCREMENT = 1;',
-                   'ALTER TABLE genre AUTO_INCREMENT = 1;']
-    for q in clear_q + reset_ids_q:
-        cursor.execute(q)
-    con.commit()
-
-
-def alterLMAO():  # todo - delete this function
-    con = mysql.connector.connect(**config())
-    cursor = con.cursor()
-    sql1 = '''ALTER TABLE actor ADD CONSTRAINT actor_unique UNIQUE (name)'''
-    sql2 = '''ALTER TABLE director ADD CONSTRAINT director_unique UNIQUE (name)'''
-    sql3 = '''ALTER TABLE genre ADD CONSTRAINT genre_unique UNIQUE (name)'''
-    cursor.execute(sql1)
-    cursor.execute(sql2)
-    cursor.execute(sql3)
-
-
 if __name__ == '__main__':
     get_csv_data("imdb_data.csv")
-    # if line_index == 404:
-    #     clear_all_tables()
     try:
         with open('csv_movie_ids.txt', 'r') as in_file:
             for line in in_file:
