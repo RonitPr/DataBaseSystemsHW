@@ -85,10 +85,16 @@ def add_index():
         cursor = con.cursor()
         try:
             cursor.execute(f'''
-            CREATE FULLTEXT INDEX idx ON movie(plot, title)
+            CREATE FULLTEXT INDEX plotTitleIndex ON movie(plot, title)
             ''')
         except:
             print('Failed to create a fulltext index to movie table plot and title.')
+        try:
+            cursor.execute(f'''
+            CREATE INDEX yearIndex ON movie(year)
+            ''')
+        except:
+            print('Failed to create an index to movie table year.')
         # note -Index creation is automatically commited after execution.
 
 
