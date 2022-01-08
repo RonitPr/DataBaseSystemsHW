@@ -16,7 +16,7 @@ def query_1(cursor, year):
     return res
 
 
-def query_2(cursor, year):  # TODO
+def query_2(cursor, year):
     sql = '''SELECT g.name, COUNT(*)
     FROM genre AS g
     JOIN movie_genre AS mg ON g.genre_id = mg.genre_id
