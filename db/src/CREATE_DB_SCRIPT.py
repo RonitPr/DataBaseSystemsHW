@@ -85,28 +85,28 @@ def add_index():
         cursor = con.cursor()
         try:
             cursor.execute(f'''
-            CREATE FULLTEXT INDEX plotTitleIndex ON movie(plot, title)
+            CREATE FULLTEXT INDEX plotTitleIndex ON movie(plot, title) USING BTREE
             ''')
         except:
             print('Failed to create a fulltext index to movie table plot and title.')
 
         try:
             cursor.execute(f'''
-            CREATE INDEX yearIndex ON movie(year)
+            CREATE INDEX yearIndex ON movie(year) USING BTREE
             ''')
         except:
             print('Failed to create an index to movie table year.')
 
         try:
             cursor.execute(f'''
-            CREATE INDEX movieIDIndex ON movie_director(movie_id)
+            CREATE INDEX movieIDIndex ON movie_director(movie_id) USING BTREE
             ''')
         except:
             print('Failed to create an index to movie_director table movie_id.')
 
         try:
             cursor.execute(f'''
-            CREATE INDEX actorIDIndex ON movie_actor(actor_id)
+            CREATE INDEX actorIDIndex ON movie_actor(actor_id) USING BTREE
             ''')
         except:
             print('Failed to create an index to movie_director table movie_id.')
