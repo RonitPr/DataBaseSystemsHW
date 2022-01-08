@@ -89,12 +89,64 @@ def add_index():
             ''')
         except:
             print('Failed to create a fulltext index to movie table plot and title.')
+
         try:
             cursor.execute(f'''
             CREATE INDEX yearIndex ON movie(year)
             ''')
         except:
             print('Failed to create an index to movie table year.')
+
+        try:
+            cursor.execute(f'''
+            CREATE INDEX movieIDIndex ON movie_director(movie_id)
+            ''')
+        except:
+            print('Failed to create an index to movie_director table movie_id.')
+
+        try:
+            cursor.execute(f'''
+            CREATE INDEX actorIDIndex ON movie_actor(actor_id)
+            ''')
+        except:
+            print('Failed to create an index to movie_director table movie_id.')
+
+        # Hash indices
+
+        try:
+            cursor.execute(f'''
+            CREATE INDEX actorHashIndex ON actor(name) USING HASH
+            ''')
+        except:
+            print('Failed to create a hash index for actor name.')
+
+        try:
+            cursor.execute(f'''
+            CREATE INDEX genreHashIndex ON genre(name) USING HASH
+            ''')
+        except:
+            print('Failed to create a hash index for genre name.')
+
+        try:
+            cursor.execute(f'''
+            CREATE INDEX directorHashIndex ON director(name) USING HASH
+            ''')
+        except:
+            print('Failed to create a hash index for director name.')
+
+        try:
+            cursor.execute(f'''
+            CREATE INDEX ratedHashIndex ON movie(rated) USING HASH
+            ''')
+        except:
+            print('Failed to create a hash index for actor name.')
+
+        try:
+            cursor.execute(f'''
+            CREATE INDEX ratedHashIndex ON movie(rated) USING HASH
+            ''')
+        except:
+            print('Failed to create a hash index for movie age group rating.')
         # note -Index creation is automatically commited after execution.
 
 
